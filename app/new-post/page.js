@@ -1,21 +1,7 @@
-import { storePost } from "@/lib/posts";
+import { createPost } from "@/action/postAction";
+import FormSubmit from "@/components/form-submit";
 
 export default function NewPostPage() {
-  async function createPost(formData){
-    "use server"
-    const title = formData.get('title');
-    const image = formData.get('image');
-    const content = formData.get('content');
-
-    console.log(title, image, content);
-
-    storePost({
-      imageUrl: '',
-      title: title,
-      content: content,
-      userId: 1
-    })
-  }
   return (
     <>
       <h1>Create a new post</h1>
@@ -26,20 +12,14 @@ export default function NewPostPage() {
         </p>
         <p className="form-control">
           <label htmlFor="image">Image URL</label>
-          <input
-            type="file"
-            accept="image/png, image/jpeg"
-            id="image"
-            name="image"
-          />
+          <input type="file" accept="image/png, image/jpeg" id="image" name="image" />
         </p>
         <p className="form-control">
           <label htmlFor="content">Content</label>
           <textarea id="content" name="content" rows="5" />
         </p>
         <p className="form-actions">
-          <button type="reset">Reset</button>
-          <button>Create Post</button>
+          <FormSubmit/>
         </p>
       </form>
     </>
