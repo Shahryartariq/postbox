@@ -29,10 +29,10 @@ export async function createPost(prevstate, formData) {
   }
 
   let imageUrl;
-  try{
+  try {
     imageUrl = await uploadImage(image);
   } catch (error) {
-     throw new Error("Upload Image Failed, So Post cannot be created Please try again")
+    throw new Error("Upload Image Failed, So Post cannot be created Please try again");
   }
 
   await storePost({
@@ -42,10 +42,11 @@ export async function createPost(prevstate, formData) {
     userId: 1,
   });
 
-  revalidatePath("/feed");
+  revalidatePath("/", "layout");
   redirect("/feed");
 }
 
-export async function togglePostLikeStatus(postId){
+export async function togglePostLikeStatus(postId) {
   updatePostLikeStatus(postId, 2);
+  revalidatePath("/", "layout");
 }
