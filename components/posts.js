@@ -1,5 +1,6 @@
 import { formatDate } from '@/lib/format';
 import LikeButton from './like-icon';
+import { togglePostLikeStatus } from '@/action/postAction';
 
 function Post({ post }) {
   return (
@@ -19,7 +20,13 @@ function Post({ post }) {
             </p>
           </div>
           <div>
+          <form 
+            action={togglePostLikeStatus.bind(null, post.id)}
+            className={post.isLiked ? 'liked': ''}  
+          >
             <LikeButton />
+
+          </form>
           </div>
         </header>
         <p>{post.content}</p>
@@ -29,6 +36,7 @@ function Post({ post }) {
 }
 
 export default function Posts({ posts }) {
+  console.log(posts)
   if (!posts || posts.length === 0) {
     return <p>There are no posts yet. Maybe start sharing some?</p>;
   }
