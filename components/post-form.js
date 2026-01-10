@@ -11,7 +11,7 @@ const PostForm = ({ action }) => {
       <form action={formAction}>
         <p className="form-control">
           <label htmlFor="title">Title</label>
-          <input type="text" id="title" name="title" />
+          <input type="text" id="title" name="title" required />
         </p>
         <p className="form-control">
           <label htmlFor="image">Image URL</label>
