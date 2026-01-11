@@ -2,7 +2,7 @@ import Header from '@/components/header';
 import './globals.css';
 
 export const metadata = {
-  title: 'NextPosts',
+  title: 'PostBox',
   description: 'Browse and share amazing posts.',
 };
 
