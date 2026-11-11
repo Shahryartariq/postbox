@@ -1,19 +1,41 @@
 {
-  "name": "postbox",
+  "name": "whisperbox",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "emulators": "firebase emulators:start --only auth,firestore --project demo-whisperbox",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-whisperbox-rules \"vitest run tests/rules\"",
+    "deploy:rules": "firebase deploy --only firestore:rules",
+    "test:e2e": "firebase emulators:exec --only auth,firestore --project demo-whisperbox \"playwright test\""
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.0.2",
-    "cloudinary": "^2.0.2",
-    "dotenv-flow": "^4.1.0",
-    "next": "14.1.0",
-    "react": "^18",
-    "react-dom": "^18"
-  }
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource/caveat": "^5.3.0",
+    "firebase": "^13.2.0",
+    "nanoid": "^6.0.2",
+    "next": "16.4.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^6.0.0",
+    "@playwright/test": "^1.65.0",
+    "@tailwindcss/turbopack": "4.3.3",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.6",
+    "firebase-tools": "^15.35.0",
+    "tailwindcss": "4.3.3",
+    "typescript": "^5",
+    "vitest": "^5.1.0"
+  },
+  "packageManager": "pnpm@10.28.0"
 }
