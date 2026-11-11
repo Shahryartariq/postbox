@@ -36,7 +36,7 @@ test("ask, answer anonymously, see it live, close the question", async ({ browse
   // A second answer straight away is rate-limited.
   await visitor.getByLabel("Your answer").fill("Me too");
   await visitor.getByRole("button", { name: "Send anonymously" }).click();
-  await expect(visitor.getByRole("alert")).toContainText("Wait 10 seconds");
+  await expect(visitor.getByText("Wait 10 seconds before sending another")).toBeVisible();
 
   // Asker closes it; the visitor's page updates live.
   await asker.getByRole("button", { name: "Stop taking answers" }).click();
