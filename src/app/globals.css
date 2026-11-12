@@ -1,0 +1,74 @@
+@import "tailwindcss";
+@import "@fontsource-variable/bricolage-grotesque/wdth.css";
+@import "@fontsource/caveat/500.css";
+@import "@fontsource/caveat/600.css";
+
+@theme {
+  --color-dusk: #2a1e5c;
+  --color-dusk-deep: #1d1442;
+  --color-dusk-soft: #3a2c74;
+  --color-paper: #fff4d6;
+  --color-paper-pink: #ffe3ee;
+  --color-paper-mint: #e1f5e6;
+  --color-ink: #22183d;
+  --color-blush: #f6a6cf;
+  --color-blush-strong: #ef7fb8;
+  --color-haze: #b8aae6;
+
+  --font-sans: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-hand: "Caveat", "Comic Sans MS", cursive;
+}
+
+html {
+  background: var(--color-dusk);
+  color: var(--color-paper);
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-variation-settings: "wdth" 100;
+  /* faint dot grid: the corkboard the notes are pinned to */
+  background-image: radial-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+::selection {
+  background: var(--color-blush);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-blush);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* A reply slip landing on the wall (only replies that arrive while you watch). */
+@keyframes slip-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-28px) rotate(calc(var(--tilt) * 4)) scale(1.04);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(3px) rotate(var(--tilt)) scale(1);
+  }
+  100% {
+    transform: translateY(0) rotate(var(--tilt));
+  }
+}
+
+.slip {
+  transform: rotate(var(--tilt));
+}
+
+.slip-new {
+  animation: slip-drop 520ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slip-new {
+    animation: none;
+  }
+}

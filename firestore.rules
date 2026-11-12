@@ -1,0 +1,112 @@
+rules_version = '2';
+
+// Whisperbox security rules.
+// - Everyone (anonymous Firebase Auth runs silently in the browser) can read
+//   questions and their answers.
+// - Only the browser that created a question can close it, delete it or delete answers.
+// - Answers never store who wrote them.
+// - limits/{uid} is stamped in the same batch as each write and used to rate-limit.
+// Numbers here must match src/lib/limits.ts.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function limitsAfter() {
+      return getAfter(/databases/$(database)/documents/limits/$(request.auth.uid)).data;
+    }
+
+    function validText(value, max) {
+      return value is string
+        && value.size() <= max
+        && value.trim().size() >= 1
+        && value == value.trim();
+    }
+
+    match /questions/{questionId} {
+      allow get: if true;
+
+      // "Your questions" on the home page: only your own.
+      allow list: if signedIn() && resource.data.ownerUid == request.auth.uid;
+
+      allow create: if signedIn()
+        && questionId.matches('^[2-9a-hjkmnp-z]{8}$')
+        && request.resource.data.keys().hasOnly(['text', 'ownerUid', 'open', 'createdAt'])
+        && request.resource.data.keys().hasAll(['text', 'ownerUid', 'open', 'createdAt'])
+        && validText(request.resource.data.text, 200)
+        && request.resource.data.text.size() >= 3
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.open == true
+        && request.resource.data.createdAt == request.time
+        && limitsAfter().lastQuestionAt == request.time;
+
+      // The owner can open or close it. Nothing else changes.
+      allow update: if signedIn()
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['open'])
+        && request.resource.data.open is bool;
+
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
+
+      match /replies/{replyId} {
+        function question() {
+          return get(/databases/$(database)/documents/questions/$(questionId)).data;
+        }
+
+        allow read: if true;
+
+        allow create: if signedIn()
+          && exists(/databases/$(database)/documents/questions/$(questionId))
+          && question().open == true
+          && request.resource.data.keys().hasOnly(['text', 'createdAt'])
+          && request.resource.data.keys().hasAll(['text', 'createdAt'])
+          && validText(request.resource.data.text, 500)
+          && request.resource.data.createdAt == request.time
+          && limitsAfter().lastReplyAt == request.time;
+
+        allow update: if false;
+
+        allow delete: if signedIn() && question().ownerUid == request.auth.uid;
+      }
+    }
+
+    match /limits/{uid} {
+      function stampedNow(field) {
+        return !(field in request.resource.data) || request.resource.data[field] == request.time;
+      }
+
+      allow read: if signedIn() && request.auth.uid == uid;
+
+      allow create: if signedIn()
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['lastQuestionAt', 'lastReplyAt'])
+        && stampedNow('lastQuestionAt')
+        && stampedNow('lastReplyAt');
+
+      // One question per 30 seconds, one answer per 10 seconds, per browser.
+      allow update: if signedIn()
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['lastQuestionAt', 'lastReplyAt'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastQuestionAt', 'lastReplyAt'])
+        && (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['lastQuestionAt'])
+          || (request.resource.data.lastQuestionAt == request.time
+              && (!('lastQuestionAt' in resource.data)
+                  || request.time > resource.data.lastQuestionAt + duration.value(30, 's')))
+        )
+        && (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['lastReplyAt'])
+          || (request.resource.data.lastReplyAt == request.time
+              && (!('lastReplyAt' in resource.data)
+                  || request.time > resource.data.lastReplyAt + duration.value(10, 's')))
+        );
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
