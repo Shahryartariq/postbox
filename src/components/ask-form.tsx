@@ -31,6 +31,10 @@ export function AskForm() {
     setError(null);
     try {
       const id = await createQuestion(user.uid, trimmed);
+      // Next.js keeps this page's state when you come back to it, so reset the
+      // form now; otherwise the button stays stuck on "Creating your link…".
+      setText("");
+      setBusy(false);
       router.push(`/q/${id}?new=1`);
     } catch {
       setError(
