@@ -2,6 +2,8 @@
 
 Ask a question, share the link, and read anonymous answers as they arrive. Nobody signs up: not you, and not the people who answer.
 
+**Live:** https://getwhisperbox.vercel.app
+
 ![Whisperbox home page](docs/home.png)
 
 ## How it works
