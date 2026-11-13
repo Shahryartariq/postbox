@@ -77,3 +77,38 @@ test("after deleting a question, the home form is ready again", async ({ page })
   await expect(page.getByRole("button", { name: "Create my link" })).toBeVisible();
   await expect(page.getByLabel("Your question")).toHaveValue("");
 });
+
+test("public pages have no serious accessibility problems", async ({ page }) => {
+  const { default: AxeBuilder } = await import("@axe-core/playwright");
+  for (const path of ["/", "/ideas", "/privacy", "/terms"]) {
+    await page.goto(path);
+    const { violations } = await new AxeBuilder({ page }).analyze();
+    const serious = violations.filter((v) => v.impact === "serious" || v.impact === "critical");
+    expect(serious.map((v) => `${path}: ${v.id}`)).toEqual([]);
+  }
+});
+
+test("an idea from /ideas lands in the question box", async ({ page }) => {
+  await page.goto("/ideas");
+  await page.getByRole("link", { name: "Ask this: Describe me in three words" }).click();
+  await expect(page).toHaveURL(/\/\?q=/);
+  await expect(page.getByLabel("Your question")).toHaveValue("Describe me in three words");
+});
+
+test("SEO basics: sitemap, robots, canonical, noindex on questions", async ({ page, request }) => {
+  const robots = await (await request.get("/robots.txt")).text();
+  expect(robots).toContain("Sitemap:");
+  const sitemap = await (await request.get("/sitemap.xml")).text();
+  for (const p of ["/ideas", "/privacy", "/terms"]) expect(sitemap).toContain(p);
+  expect(sitemap).not.toContain("/q/");
+
+  await page.goto("/");
+  await expect(page.locator('link[rel="canonical"]')).toHaveCount(1);
+  await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(1);
+  await expect(page.locator('meta[property="og:image"]')).toHaveCount(1);
+
+  await page.getByLabel("Your question").fill("Is this page indexed?");
+  await page.getByRole("button", { name: "Create my link" }).click();
+  await expect(page.getByText("Your link is ready. Share it anywhere.")).toBeVisible();
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+});

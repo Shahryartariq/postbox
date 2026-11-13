@@ -1,0 +1,9 @@
+# Whisperbox
+
+> Ask a question, share the link, and read anonymous answers as they arrive. Free, with no app and no sign-up.
+
+- [Home](https://getwhisperbox.vercel.app/): ask a question and get a share link
+- [Question ideas](https://getwhisperbox.vercel.app/ideas): 44 anonymous question ideas for friends, crushes, groups and feedback
+- [Privacy](https://getwhisperbox.vercel.app/privacy): what is stored (answers keep only text and time)
+- [Terms](https://getwhisperbox.vercel.app/terms)
+- [Source code](https://github.com/Shahryartariq/whisperbox)

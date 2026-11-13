@@ -94,7 +94,7 @@ export function Wall({
             <p className="whitespace-pre-wrap break-words font-hand text-[1.65rem] font-medium leading-[1.15]">
               {r.text}
             </p>
-            <p className="mt-2 text-xs text-ink/50">
+            <p className="mt-2 text-xs text-ink/70">
               <time dateTime={r.createdAt?.toISOString()}>{timeAgo(r.createdAt, now)}</time>
             </p>
             {isOwner && (
@@ -102,7 +102,7 @@ export function Wall({
                 type="button"
                 onClick={() => deleteReply(questionId, r.id).catch(() => {})}
                 aria-label="Delete this answer"
-                className="absolute right-2 top-1.5 rounded px-1.5 text-lg leading-none text-ink/40 hover:text-ink focus-visible:text-ink sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
+                className="absolute right-2 top-1.5 rounded px-1.5 text-lg leading-none text-ink/60 hover:text-ink focus-visible:text-ink sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
               >
                 ×
               </button>
